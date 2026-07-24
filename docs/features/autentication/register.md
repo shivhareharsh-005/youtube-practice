@@ -2,7 +2,15 @@
 
 ## Purpose
 
-The purpose of registration is to allow a new user to create an account on the platform. During registration, the system collects the required user information, validates the input, securely stores the data in the database, and prepares the account for future authentication.
+The registration feature allows a new user to create an account. During registration, the system validates the provided information, protects the password, stores the user details, and prepares the account for future login.
+
+---
+
+## Endpoint
+
+Example:
+
+- POST /api/auth/register
 
 ---
 
@@ -10,17 +18,28 @@ The purpose of registration is to allow a new user to create an account on the p
 
 ### Required Fields
 
-- Full Name
-- Username
-- Email
-- Password
+- fullName
+- username
+- email
+- password
 
 ### Optional Fields
 
-- Profile Image (Avatar)
-- Cover Image
-- Date of Birth
-- Gender
+- profileImage
+- coverImage
+- dateOfBirth
+- gender
+
+### Example
+
+```json
+{
+  "fullName": "John Doe",
+  "username": "johndoe",
+  "email": "john@example.com",
+  "password": "SecurePass123!"
+}
+```
 
 ---
 
@@ -28,69 +47,52 @@ The purpose of registration is to allow a new user to create an account on the p
 
 ### Full Name
 - Required
-- Cannot be empty
+- Must not be empty
 - Should contain valid characters only
 
 ### Username
 - Required
 - Must be unique
-- Cannot contain spaces
-- Stored in lowercase
+- Must not contain spaces
+- Preferably stored in lowercase
 
 ### Email
 - Required
-- Must be a valid email address
+- Must be a valid email format
 - Must be unique
-- Stored in lowercase
+- Preferably stored in lowercase
 
 ### Password
 - Required
 - Minimum 8 characters
-- Must contain at least:
-  - One uppercase letter
-  - One lowercase letter
-  - One digit
-  - One special character
-- Password must never be stored in plain text. It should always be stored as a hashed value.
+- Must include at least one uppercase letter, one lowercase letter, one digit, and one special character
+- Must be hashed before storage
 
-### Profile Image
-- Optional
-- If not provided, the system assigns a default avatar.
-- Users can update it later.
-
-### Cover Image
-- Optional
-- Users can upload or update it later.
-
-### Date of Birth
-- Optional
-- Used for age-related features in the future.
-
-### Gender
-- Optional
-- Stored only if the user chooses to provide it.
+### Optional Profile Fields
+- If not provided, the system can assign a default avatar or leave the field empty
+- Users can update these later
 
 ---
 
 ## Registration Flow
 
-1. User submits the registration form.
-2. Backend receives the request.
-3. Validate all required fields.
-4. Check whether the username already exists.
-5. Check whether the email already exists.
-6. Hash the password securely.
-7. Store the user information in MongoDB.
-8. Assign a default profile image if the user did not upload one.
-9. Return a success response.
+1. The user fills the registration form.
+2. The backend validates the request data.
+3. The system checks whether the username and email already exist.
+4. The password is securely hashed.
+5. The user record is saved to the database.
+6. The backend returns a success response.
 
 ---
 
 ## Success Response
 
-- User account created successfully.
-- User information is stored in the database.
-- User can now log in using their credentials.
+```json
+{
+  "success": true,
+  "message": "User registered successfully"
+}
+```
 
 ---
 
@@ -107,16 +109,15 @@ The purpose of registration is to allow a new user to create an account on the p
 - Email already exists
 
 ### 500 Internal Server Error
-- Unexpected server error
+- Unexpected server issue
 
 ---
 
 ## Edge Cases
 
-- Username already exists.
-- Email already exists.
-- User submits empty fields.
-- Password does not meet security requirements.
-- Email contains uppercase letters (convert to lowercase before storing).
-- User does not upload a profile image (assign a default avatar).
-- User refreshes the page while submitting the form.
+- Username already exists
+- Email already exists
+- Empty form submission
+- Weak password
+- Email stored with uppercase letters
+- User does not upload profile image

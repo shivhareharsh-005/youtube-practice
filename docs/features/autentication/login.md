@@ -2,7 +2,15 @@
 
 ## Purpose
 
-The purpose of login is to verify the user's identity using valid credentials. After successful verification, the system authenticates the user and grants secure access to protected resources.
+The login feature allows a registered user to authenticate into the system using their email/username and password. On success, the system issues authentication tokens and grants access to protected resources.
+
+---
+
+## Endpoint
+
+Example:
+
+- POST /api/auth/login
 
 ---
 
@@ -10,8 +18,17 @@ The purpose of login is to verify the user's identity using valid credentials. A
 
 ### Required Fields
 
-- Username or Email
-- Password
+- usernameOrEmail
+- password
+
+### Example
+
+```json
+{
+  "usernameOrEmail": "john@example.com",
+  "password": "SecurePass123!"
+}
+```
 
 ---
 
@@ -19,51 +36,56 @@ The purpose of login is to verify the user's identity using valid credentials. A
 
 ### Username / Email
 - Required
-- Must exist in the database.
+- Must be provided in the request body
+- Must match an existing user record
 
 ### Password
 - Required
-- Must not be empty.
-- The entered password must match the securely stored password.
+- Must not be empty
+- Must match the stored hashed password
 
 ---
 
 ## Login Flow
 
-1. User enters username (or email) and password.
-2. Backend receives the login request.
-3. Validate the input fields.
-4. Find the user in the database.
-5. Compare the entered password with the stored hashed password.
-6. If the credentials are valid:
-   - Generate an Access Token.
-   - Generate a Refresh Token.
-7. Store the tokens securely using HttpOnly Cookies.
-8. Return a success response.
+1. The user submits login credentials.
+2. The backend validates the request body.
+3. The system checks whether the user exists.
+4. The entered password is compared with the stored hashed password.
+5. If valid, the backend generates:
+   - an Access Token
+   - a Refresh Token
+6. The tokens are stored securely, preferably in HttpOnly cookies.
+7. The backend sends a success response.
 
 ---
 
-## Access Token
+## Token Behavior
 
-- Used to access protected APIs.
-- Has a short expiration time.
-- Sent with authenticated requests.
+### Access Token
+- Used to access protected APIs
+- Short-lived for security
+- Sent with authenticated requests
 
----
-
-## Refresh Token
-
-- Has a longer expiration time.
-- Used to generate a new Access Token when the current Access Token expires.
-- Allows the user to stay logged in without entering credentials repeatedly.
+### Refresh Token
+- Longer-lived than the Access Token
+- Used to issue a new Access Token when the current one expires
+- Helps keep the user logged in without repeating login
 
 ---
 
 ## Success Response
 
-- Login successful.
-- Authentication tokens are issued.
-- User can access protected resources.
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "user": {
+    "id": "user_id",
+    "username": "john"
+  }
+}
+```
 
 ---
 
@@ -72,20 +94,21 @@ The purpose of login is to verify the user's identity using valid credentials. A
 ### 400 Bad Request
 - Missing username/email
 - Missing password
+- Empty request body
 
 ### 401 Unauthorized
 - Invalid username/email
 - Incorrect password
 
 ### 500 Internal Server Error
-- Unexpected server error
+- Unexpected server issue
 
 ---
 
 ## Edge Cases
 
-- User does not exist.
-- Incorrect password.
-- Empty request body.
-- Expired Access Token.
-- Invalid Refresh Token.
+- User does not exist
+- Incorrect password
+- Expired Access Token
+- Invalid Refresh Token
+- Missing authentication cookies

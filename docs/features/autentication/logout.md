@@ -2,51 +2,61 @@
 
 ## Purpose
 
-The purpose of logout is to end the authenticated user session by removing the authentication tokens. After logout, the user should no longer be able to access protected resources without logging in again.
+The logout feature ends the current user session by clearing the authentication credentials and preventing further access to protected routes until the user logs in again.
 
 ---
 
-## Authentication
+## Endpoint
 
-- Logout is only available for authenticated users.
-- If the user is not logged in, the logout operation cannot be performed.
+Example:
+
+- POST /api/auth/logout
+
+---
+
+## Preconditions
+
+- The user must be authenticated.
+- A valid session or token must exist.
 
 ---
 
 ## Logout Flow
 
-1. User clicks the Logout button.
-2. Frontend sends a logout request to the backend.
-3. Backend verifies the authenticated user.
-4. Backend removes the authentication cookies.
-5. (Future) Invalidate the stored refresh token.
-6. Return a success response.
+1. The user clicks the logout button.
+2. The frontend sends a logout request to the backend.
+3. The backend verifies the authenticated session.
+4. The backend clears the authentication cookies or token storage.
+5. The backend optionally invalidates the refresh token.
+6. The backend returns a success message.
 
 ---
 
 ## Success Response
 
-- Logout successful.
-- Authentication cookies are cleared.
-- User session has ended.
+```json
+{
+  "success": true,
+  "message": "Logout successful"
+}
+```
 
 ---
 
 ## Error Responses
 
 ### 401 Unauthorized
-
-- User is not authenticated.
-- Invalid or expired authentication token.
+- User is not authenticated
+- Invalid or expired token
 
 ### 500 Internal Server Error
-
-- Unexpected server error.
+- Unexpected server issue
 
 ---
 
 ## Edge Cases
 
-- User tries to logout without being logged in.
-- Authentication token is already expired.
-- Authentication cookies are missing.
+- User tries to log out without being logged in
+- Authentication token is already expired
+- Authentication cookies are missing
+- Refresh token is already invalidated

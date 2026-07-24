@@ -1,8 +1,22 @@
-# Authentication
+# Authentication Overview
 
 ## Purpose
 
-The purpose of authentication is to verify the identity of a user before allowing access to protected resources. Once the user's identity is verified, the system can provide access to user-specific data and features based on their permissions.
+Authentication is the process of verifying a user's identity before allowing access to protected resources. It ensures that only authorized users can access account-based features and secure API endpoints.
+
+---
+
+## Scope
+
+This authentication module covers:
+
+- User registration
+- User login
+- User logout
+- Refresh token flow
+- Protected route access
+- Secure password handling
+- Token-based session management
 
 ---
 
@@ -10,29 +24,50 @@ The purpose of authentication is to verify the identity of a user before allowin
 
 - As a new user, I want to create an account so that I can use the platform.
 - As a registered user, I want to log in securely so that I can access my account.
-- As a logged-in user, I want to log out so that no one else can access my account from the same device.
-- As a logged-in user, I want to access my profile, subscriptions, watch history, and upload videos.
-- As a guest user, I want to watch public videos without logging in.
-- As a guest user, I should not be able to like, comment, subscribe, or upload videos until I authenticate myself.
+- As a logged-in user, I want to log out so that my session is safely terminated.
+- As an authenticated user, I want my requests to be accepted only after valid login.
+- As a guest user, I should not be able to access protected account features until I authenticate.
+
+---
+
+## Authentication Flow
+
+1. A user registers a new account.
+2. The user logs in with valid credentials.
+3. The system issues an Access Token and a Refresh Token.
+4. The Access Token is used for protected API requests.
+5. When the Access Token expires, the Refresh Token is used to generate a new one.
+6. The user can log out to terminate the session.
 
 ---
 
 ## Functional Requirements
 
-- Users should be able to register with valid information.
-- Users should be able to log in using valid credentials.
-- The system should securely hash passwords before storing them.
-- The system should generate Access Tokens and Refresh Tokens after successful authentication.
-- Protected routes should only be accessible to authenticated users.
-- Users should be able to log out successfully.
-- Invalid credentials should return appropriate error messages.
+- Users must be able to register with valid information.
+- Users must be able to log in with valid credentials.
+- Passwords must be hashed before storage.
+- The system must issue Access Tokens and Refresh Tokens after successful authentication.
+- Protected routes must only be accessible to authenticated users.
+- Users must be able to log out successfully.
+- Invalid credentials must return appropriate error messages.
 
 ---
 
 ## Non-Functional Requirements
 
 - Passwords must never be stored in plain text.
-- Tokens should be stored securely (HttpOnly Cookies).
-- Authentication APIs should return responses within a reasonable time.
-- Sensitive data should never be exposed in API responses.
-- Authentication should be implemented following security best practices.
+- Tokens must be stored securely, preferably in HttpOnly cookies.
+- Authentication APIs should respond within a reasonable time.
+- Sensitive data must never be exposed in responses.
+- Authentication must follow common security best practices.
+
+---
+
+## Security Principles
+
+- Use strong password validation.
+- Hash passwords with a secure algorithm.
+- Keep Access Tokens short-lived.
+- Rotate Refresh Tokens when needed.
+- Reject expired or invalid tokens.
+- Clear authentication data during logout.

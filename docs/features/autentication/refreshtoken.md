@@ -2,47 +2,76 @@
 
 ## Purpose
 
-The purpose of the Refresh Token is to allow users to stay logged in without entering their credentials repeatedly. It is used to generate a new Access Token after the current Access Token expires.
+The refresh token mechanism allows a user to stay signed in without repeatedly entering credentials. When the short-lived Access Token expires, the Refresh Token is used to issue a new Access Token.
 
 ---
 
-## Why is it Required?
+## Endpoint
 
-Access Tokens have a short expiration time for security reasons. If users had to log in every time the Access Token expired, it would result in a poor user experience.
+Example:
 
-A Refresh Token solves this problem by allowing the backend to issue a new Access Token after verifying the Refresh Token.
+- POST /api/auth/refresh-token
+
+---
+
+## Why It Is Needed
+
+Access Tokens are intentionally short-lived for security. A Refresh Token provides a safer and more convenient way to maintain the session without forcing the user to log in again after every expiration.
 
 ---
 
 ## Flow
 
-1. User logs in successfully.
-2. Backend generates:
-   - Access Token
-   - Refresh Token
-3. User accesses protected routes using the Access Token.
-4. Access Token expires.
-5. Frontend sends the Refresh Token to the backend.
-6. Backend verifies the Refresh Token.
-7. If valid:
-   - Generate a new Access Token.
-   - Send it back to the client.
-8. User continues using the application without logging in again.
+1. The user logs in successfully.
+2. The backend issues an Access Token and a Refresh Token.
+3. The user uses the Access Token to access protected routes.
+4. When the Access Token expires, the frontend sends the Refresh Token.
+5. The backend validates the Refresh Token.
+6. If the token is valid, a new Access Token is issued.
+7. The user continues using the app without logging in again.
 
 ---
 
-## If Refresh Token is Invalid or Expired
+## Validation Rules
 
-- The backend rejects the request.
-- The user must log in again.
-- New authentication tokens are generated only after successful login.
+- Refresh token must be present
+- Refresh token must be valid
+- Refresh token must not be expired
+- Refresh token must belong to an active user session
+
+---
+
+## Success Response
+
+```json
+{
+  "success": true,
+  "message": "Token refreshed successfully",
+  "accessToken": "new_access_token"
+}
+```
+
+---
+
+## Error Responses
+
+### 401 Unauthorized
+- Missing refresh token
+- Invalid refresh token
+- Expired refresh token
+
+### 403 Forbidden
+- User session has been invalidated
+
+### 500 Internal Server Error
+- Unexpected server issue
 
 ---
 
 ## Edge Cases
 
-- Missing Refresh Token.
-- Invalid Refresh Token.
-- Expired Refresh Token.
-- User account no longer exists.
-- User has logged out and the Refresh Token has been invalidated.
+- Missing Refresh Token
+- Invalid Refresh Token
+- Expired Refresh Token
+- User account deleted
+- User logged out and token revoked
