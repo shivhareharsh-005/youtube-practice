@@ -3,7 +3,7 @@ import { ApiError } from "../utils/apiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import User from "../models/user.models.js"
-import cookieParser from "cookie-parser"
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 
 const generateAccessAndRefreshToken = async(userId) => {
@@ -25,6 +25,14 @@ const register = asyncHandler( async(req, res)=>{
 
     //user details lena 
     const {fullName, username, email, password} = req.body;
+    const avatarLocalPath = req.files?.avatar?.[0]?.path;  
+    
+    let coverImageLocalPath;
+    if(req.files && Array.isArray(req.files.coverImage)
+    && req.files.coverImage.length > 0)
+    {
+        coverImageLocalPath = req.files.coverImage[0].path
+    }
     
     // fields required 
     if(!username || !email || !password){
@@ -41,12 +49,21 @@ const register = asyncHandler( async(req, res)=>{
         throw new ApiError(409, "User already exists")
     }
 
-    // user created 
+     // upload them to cloudinary
+    const avatar = await uploadOnCloudinary(avatarLocalPath);
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+    if(!avatar){
+        throw new ApiError(400, "Avatar file is required");
+    }
+    
+    // create user object - create entry in db
     const user = await User.create({
         fullName,
-        username,
+        avatar: avatar.url,
+        coverImage: coverImage?.url || "",
         email,
-        password
+        password,
+        username: username.toLowerCase()
     })
 
     const createdUser = await User.findById(user._id)
@@ -122,7 +139,6 @@ const loginUser = asyncHandler( async(req, res) => {
     )
 
 })
-
 
 const logoutUser = ( async (req, res) => {
       await User.findByIdAndUpdate(
